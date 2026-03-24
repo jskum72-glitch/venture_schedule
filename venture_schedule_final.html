@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>벤처기업 실사 일정 조율</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans KR', sans-serif; background-color: #e6ffe6; /* Light green background */ color: #333; }
+        .container-wrapper { max-width: 800px; margin: 2rem auto; padding: 1.5rem; background-color: #ffffff; border-radius: 0.75rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06); }
+        h1, h2 { color: #10B981; /* Emerald green */ }
+        label { display: block; margin-bottom: 0.25rem; font-weight: 500; color: #333; }
+        input[type="text"], input[type="date"], input[type="time"], select {
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            padding: 0.5rem 0.75rem;
+            width: 100%;
+            transition: all 0.2s;
+            background-color: #fff;
+        }
+        input[type="text"]:focus, input[type="date"]:focus, input[type="time"]:focus, select:focus {
+            outline: none;
+            border-color: #06B6D4; /* Cyan-500 */
+            box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.25);
+        }
+        button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s, box-shadow 0.2s;
+            color: #fff;
+            background-color: #10B981; /* Emerald green */
+            border: none;
+        }
+        button:hover {
+            background-color: #059669; /* Darker emerald */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
+        }
+        button.secondary {
+            background-color: #3B82F6; /* Blue */
+        }
+        button.secondary:hover {
+            background-color: #2563EB; /* Darker blue */
+        }
+        button.danger {
+            background-color: #EF4444; /* Red */
+        }
+        button.danger:hover {
+            background-color: #DC2626; /* Darker red */
+        }
+        .message-box {
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-top: 1.5rem;
+            word-break: break-all; /* Ensures long links break lines */
+        }
+        .message-box.info {
+            background-color: #D1FAE5; /* Light green */
+            border: 1px solid #34D399; /* Green border */
+            color: #10B981;
+        }
+        .message-box.error {
+            background-color: #FEE2E2; /* Light red */
+            border: 1px solid #EF4444; /* Red border */
+            color: #DC2626;
+        }
+        .message-box.success {
+            background-color: #D1FAE5; /* Light green */
+            border: 1px solid #34D399; /* Green border */
+            color: #059669;
+        }
+        .flex-col-gap > div {
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <div class="container-wrapper">
+        <div id="appMessage" class="message-box hidden text-center font-bold mb-4"></div>
+
+        <h1 class="text-3xl md:text-4xl font-extrabold text-center mb-6">벤처기업 확인 실사 일정 조율</h1>
+
+        <div id="initialSenderView" class="hidden">
+            <h2 class="text-2xl font-bold mb-4">실사 일정 제안하기</h2>
+            <p class="mb-4 leading-relaxed">KED_한국기업데이터 평가위원장 금정섭 평가위원입니다.
+벤처기업 확인을 위해 기업 실사 일정을 보내 드리오니 지정한 날짜에 대한 수락 부탁드립니다.</p>
+            <p class="mb-6 leading-relaxed">많은 업체들이 각기 다른 지역으로 신청되어 평가대기 중에 있사오니 가급적 제안드리는 날짜와 시간에 맞추어 주실 것을 부탁 드리며, 구비 서류는 메일로 발송 드리고 있습니다.</p>  <p class="mb-4 leading-relaxed">본 실사 구분(신규,재확인)에 맞는 서류로 자세한 설명과 변경된 부분 등을 라벨링 하여 발송하여 주시고, 미팅 시 라벨링 하여 준비해 주시기 바랍니다.</p>
+
+            
+            <div class="flex flex-col md:flex-row md:space-x-4 space-y-4 md:space-y-0 mb-6">
+                <div class="flex-1">
+                    <label for="clientName">거래처명</label>
+                    <input type="text" id="clientName" placeholder="예: (주)테스트기업">
+                </div>
+                <div class="flex-1">
+                    <label for="contactPerson">담당자</label>
+                    <input type="text" id="contactPerson" placeholder="예: 김철수">
+                </div>
+                <div class="flex-1">
+                    <label for="surveyType">실사 구분</label>
+                    <select id="surveyType">
+                        <option value="신규">신규</option>
+                        <option value="재확인">재확인</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="flex flex-col md:flex-row md:space-x-4 space-y-4 md:space-y-0 mb-6">
+                <div class="flex-1">
+                    <label for="clientPhone">전화번호</label>
+                    <input type="text" id="clientPhone" placeholder="예: 010-1234-5678">
+                </div>
+                <div class="flex-1">
+                    <label for="proposedDate">제안 날짜</label>
+                    <input type="date" id="proposedDate">
+                </div>
+                <div class="flex-1">
+                    <label for="proposedTime">제안 시간</label>
+                    <input type="time" id="proposedTime">
+                </div>
+            </div>
+            
+            <button onclick="generateShareLink()" class="w-full">공유 링크 생성</button>
+            
+            <div id="shareLinkResult" class="message-box hidden info">
+                <p class="font-bold mb-2">아래 링크를 복사하여 거래처에 보내세요:</p>
+                <input type="text" id="generatedLink" class="bg-white" readonly>
+                <button onclick="copyToClipboard('generatedLink')" class="mt-4 w-full secondary">링크 복사</button>
+            </div>
+        </div>
+
+        <div id="recipientView" class="hidden">
+            <h2 class="text-2xl font-bold mb-4">실사 일정 확인 및 회신</h2>
+            <p class="mb-4 leading-relaxed">KED_한국기업데이터 평가위원장 금정섭 평가위원입니다.
+벤처기업 확인을 위해 기업 실사 일정을 보내 드리오니 지정한 날짜에 대한 수락 부탁드립니다.</p>
+            <p class="mb-6 leading-relaxed">많은 업체들이 각기 다른 지역으로 신청되어 평가대기 중에 있사오니 가급적 제안드리는 날짜와 시간에 맞추어 주실 것을 부탁 드리며, 구비 서류는 메일로 발송 드리고 있습니다.</p>  <p class="mb-4 leading-relaxed">본 실사 구분(신규,재확인)에 맞는 서류로 자세한 설명과 변경된 부분 등을 라벨링 하여 발송하여 주시고, 미팅 시 라벨링 하여 준비해 주시기 바랍니다.</p>
+
+            <div class="p-4 bg-gray-50 rounded-lg mb-6">
+                <p class="text-lg font-bold text-gray-800 mb-2">제안된 실사 일정</p>
+                <p class="text-md mb-1"><span class="font-semibold">거래처명:</span> <span id="displayClientName"></span></p>
+                <p class="text-md mb-1"><span class="font-semibold">담당자:</span> <span id="displayContactPerson"></span></p>
+                <p class="text-md mb-1"><span class="font-semibold">실사 구분:</span> <span id="displaySurveyType"></span></p>
+                <p class="text-md mb-1"><span class="font-semibold">전화번호:</span> <span id="displayClientPhone"></span></p>
+                <p class="text-md"><span class="font-semibold">날짜:</span> <span id="displayProposedDate" class="text-lg text-emerald-600 font-bold"></span> <span class="font-semibold">시간:</span> <span id="displayProposedTime" class="text-lg text-emerald-600 font-bold"></span></p>
+            </div>
+
+            <div id="alternativeProposalSection" class="hidden">
+                <h3 class="text-xl font-bold mb-4">다른 날짜 제안 (1회에 한함)</h3>
+                <div class="flex flex-col md:flex-row md:space-x-4 space-y-4 md:space-y-0 mb-6">
+                    <div class="flex-1">
+                        <label for="alternativeDate">대체 날짜</label>
+                        <input type="date" id="alternativeDate">
+                    </div>
+                    <div class="flex-1">
+                        <label for="alternativeTime">대체 시간</label>
+                        <input type="time" id="alternativeTime">
+                    </div>
+                </div>
+                <button onclick="generateAlternativeLink()" class="w-full secondary">대체 일정 제안 링크 생성</button>
+                <div id="alternativeLinkResult" class="message-box hidden info">
+                    <p class="font-bold mb-2">아래 링크를 복사하여 평가위원에게 보내세요:</p>
+                    <input type="text" id="generatedAlternativeLink" class="bg-white" readonly>
+                    <button onclick="copyToClipboard('generatedAlternativeLink')" class="mt-4 w-full secondary">링크 복사</button>
+                </div>
+            </div>
+
+            <div class="flex flex-col md:flex-row md:space-x-4 space-y-4 md:space-y-0 mt-6">
+                <button onclick="acceptInitialProposal()" class="flex-1">제안된 일정 수락</button>
+                <button onclick="showAlternativeForm()" id="proposeAlternativeBtn" class="flex-1 secondary">다른 날짜 제안하기</button>
+            </div>
+            
+            <div id="recipientConfirmationResult" class="message-box hidden info">
+                <p class="font-bold mb-2">아래 링크를 복사하여 평가위원에게 보내 최종 확인을 요청하세요:</p>
+                <input type="text" id="generatedConfirmationLink" class="bg-white" readonly>
+                <button onclick="copyToClipboard('generatedConfirmationLink')" class="mt-4 w-full secondary">링크 복사</button>
+            </div>
+        </div>
+
+        <div id="senderReviewAcceptanceView" class="hidden">
+            <h2 class="text-2xl font-bold mb-4">거래처 일정 수락 확인</h2>
+            <p class="mb-4 leading-relaxed">KED_한국기업데이터 평가위원장 금정섭 평가위원입니다.
+벤처기업 확인을 위해 기업 실사 일정을 보내 드리오니 지정한 날짜에 대한 수락 부탁드립니다.</p>
+            <p class="mb-6 leading-relaxed">많은 업체들이 각기 다른 지역으로 신청되어 평가대기 중에 있사오니 가급적 제안드리는 날짜와 시간에 맞추어 주실 것을 부탁 드리며, 구비 서류는 메일로 발송 드리고 있습니다.</p>  <p class="mb-4 leading-relaxed">본 실사 구분(신규,재확인)에 맞는 서류로 자세한 설명과 변경된 부분 등을 라벨링 하여 발송하여 주시고, 미팅 시 라벨링 하여 준비해 주시기 바랍니다.</p>
+
+
+            <div class="p-4 bg-green-100 rounded-lg mb-6">
+                <p class="text-lg font-bold text-gray-800 mb-2">거래처가 귀하의 <span class="text-emerald-700">최초 제안 일정을 수락</span>하였습니다.</p>
+                <p class="text-md mb-1"><span class="font-semibold">거래처명:</span> <span id="confirmInitialClientName"></span></p>
+                <p class="text-md mb-1"><span class="font-semibold">담당자:</span> <span id="confirmInitialContactPerson"></span></p>
+                <p class="text-md mb-1"><span class="font-semibold">실사 구분:</span> <span id="confirmInitialSurveyType"></span></p>
+                <p class="text-md mb-1"><span class="font-semibold">전화번호:</span> <span id="confirmInitialClientPhone"></span></p>
+                <p class="text-md"><span class="font-semibold">제안된 날짜:</span> <span id="confirmInitialDate" class="text-lg text-emerald-600 font-bold"></span> <span class="font-semibold">시간:</span> <span id="confirmInitialTime" class="text-lg text-emerald-600 font-bold"></span></p>
+            </div>
+
+            <button onclick="finalizeAcceptanceOfInitial()" class="w-full">최종 일정 확정</button>
+            
+            <div id="senderConfirmResult" class="message-box hidden info">
+                <p class="font-bold mb-2">최종 확정 알림 링크:</p>
+                <input type="text" id="generatedConfirmLink" class="bg-white" readonly>
+                <button onclick="copyToClipboard('generatedConfirmLink')" class="mt-4 w-full secondary">링크 복사</button>
+            </div>
+        </div>
+
+        <div id="senderReviewAlternativeView" class="hidden">
+            <h2 class="text-2xl font-bold mb-4">거래처 대체 일정 검토</h2>
+            <p class="mb-4 leading-relaxed">KED_한국기업데이터 평가위원장 금정섭 평가위원입니다.
+벤처기업 확인을 위해 기업 실사 일정을 보내 드리오니 지정한 날짜에 대한 수락 부탁드립니다.</p>
+            <p class="mb-6 leading-relaxed">많은 업체들이 각기 다른 지역으로 신청되어 평가대기 중에 있사오니 가급적 제안드리는 날짜와 시간에 맞추어 주실 것을 부탁 드리며, 구비 서류는 메일로 발송 드리고 있습니다.</p>  <p class="mb-4 leading-relaxed">본 실사 구분(신규,재확인)에 맞는 서류로 자세한 설명과 변경된 부분 등을 라벨링 하여 발송하여 주시고, 미팅 시 라벨링 하여 준비해 주시기 바랍니다.</p>
+
+
+            <div class="p-4 bg-gray-50 rounded-lg mb-4">
+                <p class="text-lg font-bold text-gray-800 mb-2">최초 제안 일정</p>
+                <p class="text-md mb-1"><span class="font-semibold">거래처명:</span> <span id="reviewClientName"></span></p>
+                <p class="text-md mb-1"><span class="font-semibold">담당자:</span> <span id="reviewContactPerson"></span></p>
+                <p class="text-md mb-1"><span class="font-semibold">실사 구분:</span> <span id="reviewSurveyType"></span></p>
+                <p class="text-md mb-1"><span class="font-semibold">전화번호:</span> <span id="reviewClientPhone"></span></p>
+                <p class="text-md"><span class="font-semibold">날짜:</span> <span id="reviewProposedDate" class="text-lg text-emerald-600 font-bold"></span> <span class="font-semibold">시간:</span> <span id="reviewProposedTime" class="text-lg text-emerald-600 font-bold"></span></p>
+            </div>
+
+            <div class="p-4 bg-green-100 rounded-lg mb-6">
+                <p class="text-lg font-bold text-gray-800 mb-2">거래처 제안 대체 일정</p>
+                <p class="text-md"><span class="font-semibold">날짜:</span> <span id="reviewAlternativeDate" class="text-lg text-blue-600 font-bold"></span> <span class="font-semibold">시간:</span> <span id="reviewAlternativeTime" class="text-lg text-blue-600 font-bold"></span></p>
+            </div>
+
+            <div class="flex flex-col md:flex-row md:space-x-4 space-y-4 md:space-y-0 mt-6">
+                <button onclick="acceptAlternative()" class="flex-1">대체 일정 수락</button>
+                <button onclick="rejectAlternative()" class="flex-1 danger">대체 일정 거절</button>
+            </div>
+            
+            <div id="senderReviewResult" class="message-box hidden info">
+                <p class="font-bold mb-2">최종 결정 알림 링크:</p>
+                <input type="text" id="generatedReviewLink" class="bg-white" readonly>
+                <button onclick="copyToClipboard('generatedReviewLink')" class="mt-4 w-full secondary">링크 복사</button>
+            </div>
+        </div>
+
+        <div id="finalConfirmationView" class="hidden">
+            <h2 class="text-2xl font-bold mb-6 text-center text-emerald-700">실사 일정 최종 확정</h2>
+            <div class="p-6 bg-white rounded-lg shadow-lg text-center">
+                <p class="text-xl font-bold text-gray-800 mb-4"><span id="finalClientNameConfirm"></span> (<span id="finalContactPersonConfirm"></span>님)</p>
+                <p class="text-lg font-bold text-gray-800 mb-2">실사 구분: <span id="finalSurveyTypeConfirm"></span></p>
+                <p class="text-4xl font-extrabold mb-4"><span id="finalDateConfirm" class="text-emerald-600"></span> <span id="finalTimeConfirm" class="text-emerald-600"></span></p>
+                <p id="finalStatusMessageConfirm" class="text-lg font-semibold mt-4"></p>
+                <p class="text-md mt-6 text-gray-500">KED_한국기업데이터 평가위원장 금정섭</p>
+            </div>
+        </div>
+
+        <div class="mt-8 text-center text-gray-600">
+            <p>기타 궁금한 사항은 아래의 연락처로 문의바랍니다.</p>
+            <p class="font-bold mt-1">010-2539-4697</p>
+        </div>
+    </div>
+
+    <script>
+        let currentData = {}; // Global variable to hold decoded data
+
+        // --- Helper Functions ---
+        function getQueryParams() {
+            const params = {};
+            window.location.search.substring(1).split('&').forEach(param => {
+                const parts = param.split('=');
+                if (parts[0] && parts[1]) {
+                    params[decodeURIComponent(parts[0])] = decodeURIComponent(parts[1]);
+                }
+            });
+            return params;
+        }
+
+        function encodeData(obj) {
+            return btoa(encodeURIComponent(JSON.stringify(obj)));
+        }
+
+        function decodeData(str) {
+            try {
+                return JSON.parse(decodeURIComponent(atob(str)));
+            } catch (e) {
+                console.error("Failed to decode data:", e);
+                return null;
+            }
+        }
+
+        function updateURL(data) {
+            const baseUrl = window.location.origin + window.location.pathname;
+            const newUrl = `${baseUrl}?data=${encodeData(data)}`;
+            return newUrl;
+        }
+
+        function copyToClipboard(elementId) {
+            const copyText = document.getElementById(elementId);
+            copyText.select();
+            copyText.setSelectionRange(0, 99999); // For mobile devices
+            document.execCommand("copy");
+            showMessage("링크가 복사되었습니다!", "success");
+        }
+
+        function showMessage(msg, type = 'info') {
+            const msgBox = document.getElementById('appMessage');
+            msgBox.textContent = msg;
+            msgBox.classList.remove('hidden', 'info', 'error', 'success');
+            msgBox.classList.add('block', type);
+            setTimeout(() => {
+                msgBox.classList.add('hidden');
+            }, 5000); // Hide after 5 seconds
+        }
+
+        function hideAllViews() {
+            document.getElementById('initialSenderView').classList.add('hidden');
+            document.getElementById('recipientView').classList.add('hidden');
+            document.getElementById('senderReviewAcceptanceView').classList.add('hidden');
+            document.getElementById('senderReviewAlternativeView').classList.add('hidden');
+            document.getElementById('finalConfirmationView').classList.add('hidden');
+        }
+
+        function showInitialSenderView() {
+            document.getElementById('initialSenderView').classList.remove('hidden');
+        }
+
+        // --- Sender's Initial View Functions ---
+        function generateShareLink() {
+            const clientName = document.getElementById('clientName').value;
+            const contactPerson = document.getElementById('contactPerson').value;
+            const clientPhone = document.getElementById('clientPhone').value;
+            const surveyType = document.getElementById('surveyType').value; // Get survey type
+            const proposedDate = document.getElementById('proposedDate').value;
+            const proposedTime = document.getElementById('proposedTime').value;
+
+            if (!clientName || !contactPerson || !clientPhone || !surveyType || !proposedDate || !proposedTime) {
+                showMessage('모든 필수 정보를 입력해주세요.', 'error');
+                return;
+            }
+
+            const data = {
+                step: 'recipient-proposal',
+                clientInfo: { clientName, contactPerson, clientPhone, surveyType }, // Include survey type
+                initialProposal: { date: proposedDate, time: proposedTime }
+            };
+            const link = updateURL(data);
+            document.getElementById('generatedLink').value = link;
+            document.getElementById('shareLinkResult').classList.remove('hidden');
+            showMessage('공유 링크가 생성되었습니다. 복사하여 거래처에 보내세요.', 'info');
+        }
+
+        // --- Recipient's View Functions ---
+        function renderRecipientProposalView(data) {
+            currentData = data;
+            document.getElementById('recipientView').classList.remove('hidden');
+            document.getElementById('displayClientName').textContent = data.clientInfo.clientName;
+            document.getElementById('displayContactPerson').textContent = data.clientInfo.contactPerson;
+            document.getElementById('displaySurveyType').textContent = data.clientInfo.surveyType; // Display survey type
+            document.getElementById('displayClientPhone').textContent = data.clientInfo.clientPhone;
+            document.getElementById('displayProposedDate').textContent = data.initialProposal.date;
+            document.getElementById('displayProposedTime').textContent = data.initialProposal.time;
+
+            document.getElementById('proposeAlternativeBtn').classList.remove('hidden'); // Ensure button is visible
+            document.getElementById('alternativeProposalSection').classList.add('hidden'); // Hide alternative form initially
+            document.getElementById('recipientConfirmationResult').classList.add('hidden'); // Hide confirmation result
+            document.getElementById('alternativeLinkResult').classList.add('hidden'); // Hide alternative link result
+        }
+
+        function acceptInitialProposal() {
+            currentData.step = 'recipient-accepted-initial';
+            const link = updateURL(currentData);
+            document.getElementById('generatedConfirmationLink').value = link;
+            document.getElementById('recipientConfirmationResult').classList.remove('hidden');
+            document.getElementById('proposeAlternativeBtn').classList.add('hidden'); // Hide propose alternative button after acceptance
+            showMessage('일정 수락 링크가 생성되었습니다. 평가위원에게 보내세요.', 'info');
+        }
+
+        function showAlternativeForm() {
+            document.getElementById('alternativeProposalSection').classList.remove('hidden');
+            document.getElementById('proposeAlternativeBtn').classList.add('hidden'); // Hide the button once the form is shown
+        }
+
+        function generateAlternativeLink() {
+            const alternativeDate = document.getElementById('alternativeDate').value;
+            const alternativeTime = document.getElementById('alternativeTime').value;
+
+            if (!alternativeDate || !alternativeTime) {
+                showMessage('대체 날짜와 시간을 입력해주세요.', 'error');
+                return;
+            }
+
+            currentData.step = 'recipient-proposed-alternative';
+            currentData.alternativeProposal = { date: alternativeDate, time: alternativeTime };
+
+            const link = updateURL(currentData);
+            document.getElementById('generatedAlternativeLink').value = link;
+            document.getElementById('alternativeLinkResult').classList.remove('hidden');
+            showMessage('대체 일정 제안 링크가 생성되었습니다. 평가위원에게 보내세요.', 'info');
+        }
+
+        // --- Sender's Review Functions ---
+        function renderSenderReviewAcceptanceView(data) {
+            currentData = data;
+            document.getElementById('senderReviewAcceptanceView').classList.remove('hidden');
+            document.getElementById('confirmInitialClientName').textContent = data.clientInfo.clientName;
+            document.getElementById('confirmInitialContactPerson').textContent = data.clientInfo.contactPerson;
+            document.getElementById('confirmInitialSurveyType').textContent = data.clientInfo.surveyType; // Display survey type
+            document.getElementById('confirmInitialClientPhone').textContent = data.clientInfo.clientPhone;
+            document.getElementById('confirmInitialDate').textContent = data.initialProposal.date;
+            document.getElementById('confirmInitialTime').textContent = data.initialProposal.time;
+        }
+
+        function finalizeAcceptanceOfInitial() {
+            currentData.step = 'final-status';
+            currentData.finalStatus = 'initial-accepted';
+            currentData.finalDate = currentData.initialProposal.date;
+            currentData.finalTime = currentData.initialProposal.time;
+
+            const link = updateURL(currentData);
+            document.getElementById('generatedConfirmLink').value = link;
+            document.getElementById('senderConfirmResult').classList.remove('hidden');
+            showMessage('최종 확정 알림 링크가 생성되었습니다. 거래처에 보내 최종 확정을 알리세요.', 'success');
+        }
+
+        function renderSenderReviewAlternativeView(data) {
+            currentData = data;
+            document.getElementById('senderReviewAlternativeView').classList.remove('hidden');
+            document.getElementById('reviewClientName').textContent = data.clientInfo.clientName;
+            document.getElementById('reviewContactPerson').textContent = data.clientInfo.contactPerson;
+            document.getElementById('reviewSurveyType').textContent = data.clientInfo.surveyType; // Display survey type
+            document.getElementById('reviewClientPhone').textContent = data.clientInfo.clientPhone;
+            document.getElementById('reviewProposedDate').textContent = data.initialProposal.date;
+            document.getElementById('reviewProposedTime').textContent = data.initialProposal.time;
+            document.getElementById('reviewAlternativeDate').textContent = data.alternativeProposal.date;
+            document.getElementById('reviewAlternativeTime').textContent = data.alternativeProposal.time;
+        }
+
+        function acceptAlternative() {
+            currentData.step = 'final-status';
+            currentData.finalStatus = 'alternative-accepted';
+            currentData.finalDate = currentData.alternativeProposal.date;
+            currentData.finalTime = currentData.alternativeProposal.time;
+
+            const link = updateURL(currentData);
+            document.getElementById('generatedReviewLink').value = link;
+            document.getElementById('senderReviewResult').classList.remove('hidden');
+            showMessage('대체 일정 수락 알림 링크가 생성되었습니다. 거래처에 보내 최종 확정을 알리세요.', 'success');
+        }
+
+        function rejectAlternative() {
+            currentData.step = 'final-status';
+            currentData.finalStatus = 'alternative-rejected';
+            currentData.finalDate = currentData.initialProposal.date; // Revert to initial proposal if rejected
+            currentData.finalTime = currentData.initialProposal.time; // Revert to initial proposal if rejected
+
+            const link = updateURL(currentData);
+            document.getElementById('generatedReviewLink').value = link;
+            document.getElementById('senderReviewResult').classList.remove('hidden');
+            showMessage('대체 일정을 거절하고 최초 제안 일정을 다시 제안하는 링크가 생성되었습니다. 이 링크를 거래처에 보내주세요.', 'info');
+        }
+
+        // --- Final Confirmation View Functions ---
+        function renderFinalConfirmationView(data) {
+            document.getElementById('finalConfirmationView').classList.remove('hidden');
+            document.getElementById('finalClientNameConfirm').textContent = data.clientInfo.clientName;
+            document.getElementById('finalContactPersonConfirm').textContent = data.clientInfo.contactPerson;
+            document.getElementById('finalSurveyTypeConfirm').textContent = data.clientInfo.surveyType; // Display survey type
+            document.getElementById('finalDateConfirm').textContent = data.finalDate;
+            document.getElementById('finalTimeConfirm').textContent = data.finalTime;
+
+            let message = '';
+            let textColorClass = 'text-gray-700'; // Default color
+
+            if (data.finalStatus === 'initial-accepted' || data.finalStatus === 'alternative-accepted') {
+                message = '실사 일정이 최종 확정되었습니다.';
+                textColorClass = 'text-emerald-600'; // Green for accepted
+            } else if (data.finalStatus === 'alternative-rejected') {
+                message = '대체 일정이 거절되었으며, 최초 제안된 일정으로 확정되었습니다.';
+                textColorClass = 'text-red-600'; // Red for rejected alternative
+            }
+            
+            // Apply text color to date, time, and message
+            document.getElementById('finalDateConfirm').className = ''; // Clear existing classes
+            document.getElementById('finalDateConfirm').classList.add(textColorClass, 'font-extrabold');
+            document.getElementById('finalTimeConfirm').className = ''; // Clear existing classes
+            document.getElementById('finalTimeConfirm').classList.add(textColorClass, 'font-extrabold');
+            document.getElementById('finalStatusMessageConfirm').className = ''; // Clear existing classes
+            document.getElementById('finalStatusMessageConfirm').classList.add(textColorClass);
+
+            document.getElementById('finalStatusMessageConfirm').textContent = message;
+        }
+
+
+        // --- App Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const params = getQueryParams();
+            const encodedData = params.data;
+            const data = encodedData ? decodeData(encodedData) : null;
+
+            hideAllViews(); // Hide all views initially
+
+            if (data && data.step) {
+                if (data.step === 'recipient-proposal') {
+                    renderRecipientProposalView(data);
+                } else if (data.step === 'recipient-accepted-initial') {
+                    renderSenderReviewAcceptanceView(data);
+                } else if (data.step === 'recipient-proposed-alternative') {
+                    renderSenderReviewAlternativeView(data);
+                } else if (data.step === 'final-status') {
+                    renderFinalConfirmationView(data); // Render the new final confirmation view
+                } else {
+                    showInitialSenderView(); // Fallback to sender view if step is unknown
+                }
+            } else {
+                showInitialSenderView(); // Show initial sender view if no data
+            }
+
+            // Set current date for date input default
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            document.getElementById('proposedDate').value = `${yyyy}-${mm}-${dd}`;
+            document.getElementById('alternativeDate').value = `${yyyy}-${mm}-${dd}`;
+        });
+
+    </script>
+</body>
+</html>
